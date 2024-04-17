@@ -1,0 +1,34 @@
+.homeLayout{
+    display: flex;
+    height: 85%;
+    justify-content: center;
+    align-items: center;
+    
+}
+
+.homeContainer{
+    background-color: #4b444434;
+    display: flex;
+    flex-direction: column;
+    height:80%;
+    width: 50%;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    border-radius: 10px;
+    gap: 5px;
+}
+
+.homeInput{
+    width:80%;
+    padding: 5px;
+    border-radius: 5px;
+}
+
+.button{
+    background-color: rgb(47, 255, 85);
+    cursor: pointer;
+    border: 0;
+    padding: 1rem;
+    margin-top: 5px;
+}
