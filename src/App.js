@@ -5,6 +5,7 @@ import Home from "./components/Home";
 import UserDetails from "./components/UserDetails";
 import Followers from "./components/Followers";
 import SavedUser from "./components/SavedUser";
+import RepoInfo from "./components/RepoInfo";
 
 const route = createBrowserRouter([
   {
@@ -24,6 +25,7 @@ const route = createBrowserRouter([
         element: <Followers />,
       },
       { path: "/savedUsers", element: <SavedUser /> },
+      { path: "/userProfile/repoInfo", element: <RepoInfo /> },
     ],
   },
 ]);

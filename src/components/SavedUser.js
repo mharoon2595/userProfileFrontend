@@ -46,6 +46,7 @@ const SavedUser = () => {
       setIsLoading(false);
     } catch (err) {
       swal("Error", err.message, "error");
+      setIsLoading(false);
     }
   };
 
