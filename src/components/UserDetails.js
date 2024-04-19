@@ -117,6 +117,7 @@ const UserDetails = () => {
         dispatch(addUser({ [selectedUser]: response.user }));
       } catch (err) {
         await swal("Error", err.message, "error");
+        setIsLoading(false);
         navigate("/");
       }
     };

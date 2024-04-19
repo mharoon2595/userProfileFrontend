@@ -71,6 +71,7 @@ const SavedUser = () => {
       setData(response.data);
     } catch (err) {
       await swal("Error", "Something went wrong", "error");
+      setIsLoading(false);
     }
   };
 
@@ -85,6 +86,7 @@ const SavedUser = () => {
       setShowData(true);
     } catch (err) {
       await swal("Error", "Something went wrong", "error");
+      setIsLoading(false);
     }
   };
 
