@@ -15,7 +15,8 @@ const Home = () => {
     setUserInput(event.target.value);
   };
 
-  const submitHandler = async () => {
+  const submitHandler = async (event) => {
+    event.preventDefault();
     dispatch(setUsername(userInput));
     navigate("/userProfile");
   };
@@ -24,14 +25,17 @@ const Home = () => {
     <div className={styles.homeLayout}>
       <div className={styles.homeContainer}>
         <h2>Search for a user on Github</h2>
-        <input
-          className={styles.homeInput}
-          placeholder="Enter a username"
-          onChange={changeHandler}
-        ></input>
-        <button className={styles.button} onClick={submitHandler}>
-          Submit
-        </button>
+        <form className={styles.form} onSubmit={submitHandler}>
+          <input
+            className={styles.homeInput}
+            placeholder="Enter a username"
+            onChange={changeHandler}
+            required
+          ></input>
+          <button className={styles.button} type="submit">
+            Submit
+          </button>
+        </form>
       </div>
     </div>
   );

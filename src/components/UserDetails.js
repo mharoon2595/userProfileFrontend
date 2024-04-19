@@ -4,17 +4,20 @@ import styles from "./UserDetails.module.css";
 import swal from "sweetalert";
 import { addRepo } from "../store/repoSlice";
 import RepoCard from "./RepoCard";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { addUser, editUserDetails } from "../store/fetchedUserSlice";
 import Backdrop from "../utils/Backdrop";
 import Modal from "../utils/Modal";
+import LoadingSpinner from "../utils/LoadingSpinner";
 
 const UserDetails = () => {
   const data = useSelector((state) => state.fetchedUserData.data);
   const repoData = useSelector((state) => state.repoData.repoCache);
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const [edit, setEdit] = useState(false);
   const [editValue, setEditValue] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
   const selectedUser = useSelector(
     (state) => state.fetchedUserData.searchedUser
   );
@@ -37,7 +40,10 @@ const UserDetails = () => {
         `http://localhost:8000/api/users/data/${selectedUser}/edit`,
         {
           method: "PATCH",
-          headers: { "Content-type": "application/json" },
+          headers: {
+            "Content-type": "application/json",
+            Authorization: "Bearer " + process.env.REACT_APP_GITHUB_KEY,
+          },
           body: JSON.stringify({ [editValue]: newDetails }),
         }
       );
@@ -46,9 +52,9 @@ const UserDetails = () => {
         throw new Error(response.message);
       }
 
-      swal("Alright!", editValue + " updated!", "success");
+      await swal("Alright!", editValue + " updated!", "success");
     } catch (err) {
-      swal("Oops", err.message, "error");
+      await swal("Oops", err.message, "error");
     }
   };
 
@@ -65,16 +71,32 @@ const UserDetails = () => {
   useEffect(() => {
     const fetchRepos = async () => {
       try {
-        const fetchData = await fetch(data[selectedUser].repos_url);
+        if (!data[selectedUser]) {
+          return;
+        }
+        const fetchData = await fetch(
+          data[selectedUser].repos_url + "?per_page=100",
+          {
+            headers: {
+              "Content-type": "application/json",
+              Authorization: "Bearer " + process.env.REACT_APP_GITHUB_KEY,
+            },
+          }
+        );
         const response = await fetchData.json();
         console.log("response from userDetails--->", response);
         dispatch(addRepo({ [selectedUser]: response }));
+        setIsLoading(false);
       } catch (err) {
-        swal("Uh-oh!", err.message, "error");
+        await swal("Uh-oh!", err.message, "error");
+        setIsLoading(false);
+        navigate("/");
       }
     };
-    fetchRepos();
-  }, [data]);
+    if (!repoData[selectedUser] && selectedUser !== "") {
+      fetchRepos();
+    }
+  }, [data, selectedUser]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -87,23 +109,25 @@ const UserDetails = () => {
         }
         const response = await fetchReq.json();
         console.log("response--->", response);
-        swal(
+        await swal(
           "Alright!",
           `Here are the details of '${selectedUser}'`,
           "success"
         );
         dispatch(addUser({ [selectedUser]: response.user }));
       } catch (err) {
-        swal("Error", err.message, "error");
+        await swal("Error", err.message, "error");
+        navigate("/");
       }
     };
-    if (!data[selectedUser]) {
+    if (!data[selectedUser] && selectedUser !== "") {
       fetchData();
     }
-  }, []);
+  }, [data, selectedUser]);
 
   return (
     <>
+      {isLoading && <LoadingSpinner asOverlay />}
       {edit && <Backdrop onClick={editingFalse} />}
       {edit && (
         <Modal>
@@ -183,13 +207,37 @@ const UserDetails = () => {
               </div>
             </div>
           </div>
+          <div className={styles.details}>
+            <div style={{ width: "20rem" }}>
+              Followers: {data[selectedUser].followers}
+            </div>
+
+            <div style={{ width: "20rem" }}>
+              Friends: {data[selectedUser].friends}
+            </div>
+          </div>
+          <div className={styles.details}>
+            <div style={{ width: "20rem" }}>
+              Public repos: {data[selectedUser].public_repos}
+            </div>
+
+            <div style={{ width: "20rem" }}>
+              Blog: {data[selectedUser].blog}
+            </div>
+          </div>
+
           <button className={styles.button}>
-            <Link to="/userProfile/followers">Followers</Link>
+            <Link to="/userProfile/followers">Followers list</Link>
           </button>
         </div>
       )}
       <div className={styles.userLayout}>
-        <h2>Repos:</h2>
+        <h2>
+          Repos:
+          {repoData[selectedUser] && repoData[selectedUser].length === 0
+            ? " " + "Nil"
+            : ""}
+        </h2>
         <div className={styles.repoLayout}>
           {repoData[selectedUser] &&
             repoData[selectedUser].map((item) => <RepoCard details={item} />)}

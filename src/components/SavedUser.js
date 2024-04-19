@@ -2,27 +2,61 @@ import React, { useEffect, useState } from "react";
 import styles from "./SavedUser.module.css";
 import swal from "sweetalert";
 import SavedUserCard from "./SavedUserCard";
+import { useDispatch, useSelector } from "react-redux";
+import { addSavedUsers } from "../store/savedUserSlice";
+import { setUsername } from "../store/fetchedUserSlice";
+import { useNavigate } from "react-router-dom";
+import LoadingSpinner from "../utils/LoadingSpinner";
 
 const SavedUser = () => {
   const [data, setData] = useState([]);
   const [selectedValue, setSelectedValue] = useState("none");
+  const [isLoading, setIsLoading] = useState(true);
+  const [showData, setShowData] = useState(false);
   const [selectedValue1, setSelectedValue1] = useState("none");
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const dataFromStore = useSelector((state) => state.savedUsers.users);
+
+  const clickHandler = (arg) => {
+    dispatch(setUsername(arg));
+    navigate("/userProfile");
+  };
 
   const handleSearchDropdownChange = (event) => {
     setSelectedValue(event.target.value);
     if (event.target.value === "none") {
-      setData([]);
+      setData(dataFromStore);
     }
   };
 
   const handleSortDropdownChange = (event) => {
     setSelectedValue1(event.target.value);
     if (event.target.value === "none") {
-      setData([]);
+      setData(dataFromStore);
     }
   };
 
-  useEffect(() => {}, [data]);
+  const fetchAllUsers = async () => {
+    try {
+      const fetchData = await fetch("http://localhost:8000/api/users/all");
+      const response = await fetchData.json();
+      dispatch(addSavedUsers(response.Users));
+      setData(response.Users);
+      setIsLoading(false);
+    } catch (err) {
+      swal("Error", err.message, "error");
+    }
+  };
+
+  useEffect(() => {
+    if (data.length === 0) {
+      fetchAllUsers();
+    } else {
+      setData(dataFromStore);
+      setIsLoading(false);
+    }
+  }, [dataFromStore]);
 
   const searchSubmitHandler = async (event) => {
     event.preventDefault();
@@ -36,7 +70,7 @@ const SavedUser = () => {
       console.log("RESPONSE FROM SAVED USER--->", response);
       setData(response.data);
     } catch (err) {
-      swal("Error", "Something went wrong", "error");
+      await swal("Error", "Something went wrong", "error");
     }
   };
 
@@ -47,14 +81,16 @@ const SavedUser = () => {
         `http://localhost:8000/api/users/sort/${selectedValue1}`
       );
       const response = await fetchData.json();
-      console.log("RESPONSE--->", response);
+      setData(response.sortedList);
+      setShowData(true);
     } catch (err) {
-      swal("Error", "Something went wrong", "error");
+      await swal("Error", "Something went wrong", "error");
     }
   };
 
   return (
     <>
+      {isLoading && <LoadingSpinner asOverlay />}
       <h2 style={{ textAlign: "center", margin: "10px", padding: "10px" }}>
         {" "}
         Saved users in database
@@ -78,12 +114,12 @@ const SavedUser = () => {
               value={selectedValue}
               onChange={handleSearchDropdownChange}
             >
+              <option value="username">Username</option>
               <option value="none">None</option>
               <option value="name">Name</option>
               <option value="location">Location</option>
               <option value="blog">Blog</option>
               <option value="email">E-mail</option>
-              <option value="username">Username</option>
             </select>
             <input
               type="text"
@@ -135,11 +171,24 @@ const SavedUser = () => {
         </div>
       </div>
       <div className={styles.gridLayout}>
-        {data.map((item) => {
-          if (item.deleted === false) {
-            return <SavedUserCard details={item} />;
-          }
-        })}
+        {data ? (
+          data.map((item) => {
+            if (item.deleted === false) {
+              return (
+                <SavedUserCard
+                  details={item}
+                  sortDetails={showData}
+                  sortValue={selectedValue1}
+                  onClick={() => {
+                    clickHandler(item.username);
+                  }}
+                />
+              );
+            }
+          })
+        ) : (
+          <h2>No results found.</h2>
+        )}
       </div>
     </>
   );

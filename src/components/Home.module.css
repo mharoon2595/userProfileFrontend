@@ -31,4 +31,12 @@
     border: 0;
     padding: 1rem;
     margin-top: 5px;
+    width: min-content;
+}
+
+.form{
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: center;
 }

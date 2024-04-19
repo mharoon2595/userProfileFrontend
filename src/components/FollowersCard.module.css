@@ -1,6 +1,9 @@
 .card{
     display: flex;
-    gap: 5px
+    gap: 5px;
+    background-color: grey;
+    border-radius: 10px;
+    cursor: pointer;
 }
 
 .img{
