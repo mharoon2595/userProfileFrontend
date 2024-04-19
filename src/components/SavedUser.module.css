@@ -1,0 +1,7 @@
+.gridLayout{
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  padding:1rem;
+  column-gap: 10px;
+  row-gap: 10px;
+}

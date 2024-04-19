@@ -16,5 +16,10 @@ button{
     display: flex;
     align-items: center;
     border-radius: 10px;
-    
+    cursor: pointer;
+}
+
+.localDiv{
+    display: flex;
+    gap: 5px;
 }

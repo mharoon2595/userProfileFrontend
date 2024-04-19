@@ -1,0 +1,58 @@
+.userLayout{
+    display: flex;
+    flex-direction: column;
+    min-height: 30%;
+    align-items: center;
+    gap: 3px;
+    padding:1rem;
+    margin: 2rem;
+    background-color: #4b444434;
+    border-radius: 10px;
+}
+
+.img{
+    width: 60px;
+    height:60px;
+}
+
+.details{
+    display: flex;
+    width:100%;
+    gap: 5px;
+    justify-content: space-evenly;
+    font-weight: bolder;
+    margin: 10px;
+}
+
+.repoLayout{
+    display: grid;
+    column-gap: 10px;
+    row-gap: 10px;
+    width:60%;
+    grid-template-columns: 50% 50%;
+    min-height: 30%;
+    padding:1rem;
+    margin: 2rem;
+    border-radius: 10px;
+}
+
+.button{
+    margin: 10px;
+    padding: 10px;
+    display: flex;
+    justify-content: center;
+    background-color: gold;
+    width: 30%;
+    text-align: center;
+}
+
+.bio{
+  display: flex;
+  width:20rem;
+  justify-content: space-between;
+}
+
+.edit{
+    color: blue;
+    cursor: pointer;
+}
